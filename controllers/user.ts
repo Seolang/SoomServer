@@ -2,8 +2,62 @@
 import User from "../interfaces/User.ts";
 // models
 import UserModel from "../models/user.ts";
-import ExerciseModel from "../models/exerciseData.ts";
+export const login = async (
+  { request, response }: {
+    request: any;
+    response: any;
+  },
+) => {
+  const value = await request.body().value;
+  // console.log(JSON.stringify(value));
+  // console.log(JSON.parse(value));
+  // const jsonParse = await JSON.parse(value);
+  try {
+    const idCheck = await UserModel.doesExistById(
+      { USR_ID: value.USR_ID },
+    );
 
+    if (!idCheck) {
+      response.status = 200;
+      response.body = {
+        success: false,
+        message: "해당 아이디 없음",
+        response: { USR_SEQ: -2 },
+      };
+      return;
+    }
+    const passwordCheck = await UserModel.checkUserIdPwd({
+      USR_ID: value.USR_ID,
+      USR_PWD: value.USR_PWD,
+    });
+    if (!passwordCheck) {
+      response.status = 200;
+      response.body = {
+        success: false,
+        message: "비밀번호 불일치",
+        response: { USR_SEQ: -1 },
+      };
+      return;
+    }
+
+    const user: User = await UserModel.getUserIdPwd({
+      USR_ID: value.USR_ID,
+      USR_PWD: value.USR_PWD,
+    });
+    response.status = 200;
+    response.body = {
+      success: true,
+      message: "아이디, 비밀번호 일치",
+      response: user,
+    };
+  } catch (error) {
+    response.status = 400;
+    response.body = {
+      success: false,
+      message: `Error login: ${error}`,
+    };
+  }
+};
 export default {
   getAllUsers: async ({ response }: { response: any }) => {
     try {
@@ -17,7 +71,7 @@ export default {
       response.status = 400;
       response.body = {
         success: false,
-        message: `Error: ${error}`,
+        message: `Error getuser: ${error}`,
       };
     }
   },
@@ -64,66 +118,129 @@ export default {
       response.status = 400;
       response.body = {
         success: false,
-        message: `Error: ${error}`,
+        message: `Error create user: ${error}`,
       };
     }
   },
-  // updateUserById: async (
-  //   { params, request, response }: {
-  //     params: { id: string };
-  //     request: any;
-  //     response: any;
-  //   },
-  // ) => {
-  //   try {
-  //     const isAvailable = await UserModel.doesExistById(
-  //       { id: Number(params.id) },
-  //     );
-  //     if (!isAvailable) {
-  //       response.status = 404;
-  //       response.body = {
-  //         success: false,
-  //         message: "No user found",
-  //       };
-  //       return;
-  //     }
+  userLogin: async (
+    { params, response }: {
+      params: { USR_ID: any; USR_PWD: any };
+      response: any;
+    },
+  ) => {
+    try {
+      const isAvailable = await UserModel.doesExistById(
+        { USR_ID: params.USR_ID },
+      );
 
-  //     const body = await request.body();
-  //     const updatedRows = await UserModel.updateById({
-  //       id: Number(params.id),
-  //       ...body.value,
-  //     });
-  //     response.status = 200;
-  //     response.body = {
-  //       success: true,
-  //       message: `Successfully updated ${updatedRows} row(s)`,
-  //     };
-  //   } catch (error) {
-  //     response.status = 400;
-  //     response.body = {
-  //       success: false,
-  //       message: `Error: ${error}`,
-  //     };
-  //   }
-  // },
-  // deleteUserById: async (
-  //   { params, response }: { params: { id: string }; response: any },
-  // ) => {
-  //   try {
-  //     const updatedRows = await UserModel.deleteById({
-  //       id: Number(params.id),
-  //     });
-  //     response.status = 200;
-  //     response.body = {
-  //       success: true,
-  //       message: `Successfully updated ${updatedRows} row(s)`,
-  //     };
-  //   } catch (error) {
-  //     response.status = 400;
-  //     response.body = {
-  //       success: false,
-  //       message: `Error: ${error}`,
-  //     };
-  //   }
-  // },
+      if (!isAvailable) {
+        response.status = 404;
+        response.body = {
+          success: false,
+          message: "해당 아이디 없음",
+          response: { USR_SEQ: -2 },
+        };
+        return;
+      }
+      const loginCheck = await UserModel.checkUserIdPwd({
+        USR_ID: params.USR_ID,
+        USR_PWD: params.USR_PWD,
+      });
+      if (!loginCheck) {
+        response.status = 404;
+        response.body = {
+          success: false,
+          message: "비밀번호 불일치",
+          response: { USR_SEQ: -1 },
+        };
+        return;
+      }
+
+      const user: User = await UserModel.getUserIdPwd({
+        USR_ID: params.USR_ID,
+        USR_PWD: params.USR_PWD,
+      });
+      response.status = 200;
+      response.body = {
+        success: true,
+        message: "아이디, 비밀번호 일치",
+        response: user,
+      };
+    } catch (error) {
+      response.status = 400;
+      response.body = {
+        success: false,
+        message: `Error userlogin: ${error}`,
+      };
+    }
+  },
+  getExerRawById: async (
+    { params, response }: { params: { USR_ID: any }; response: any },
+  ) => {
+    try {
+      const isAvailable = await UserModel.doesExistById(
+        { USR_ID: params.USR_ID },
+      );
+
+      if (!isAvailable) {
+        response.status = 404;
+        response.body = {
+          success: false,
+          message: "존재하지 않는 유저",
+        };
+        return;
+      }
+
+      const user: User = await UserModel.getExerciseRawById({
+        USR_ID: params.USR_ID,
+      });
+      response.status = 200;
+      response.body = {
+        success: true,
+        data: user,
+      };
+    } catch (error) {
+      response.status = 400;
+      response.body = {
+        success: false,
+        message: `Error getexerraw: ${error}`,
+      };
+    }
+  },
+  getExerHisById: async (
+    { params, response }: { params: { USR_ID: any }; response: any },
+  ) => {
+    try {
+      const isAvailable = await UserModel.doesExistById(
+        { USR_ID: params.USR_ID },
+      );
+
+      if (!isAvailable) {
+        response.status = 404;
+        response.body = {
+          success: false,
+          message: "존재하지 않는 유저",
+        };
+        return;
+      }
+
+      const user: User = await UserModel.getExerciseHisById({
+        USR_ID: params.USR_ID,
+      });
+      response.status = 200;
+      response.body = {
+        success: true,
+        data: user,
+      };
+    } catch (error) {
+      response.status = 400;
+      response.body = {
+        success: false,
+        message: `Error getexerhis: ${error}`,
+      };
+    }
+  },
+
+
+  
 };
