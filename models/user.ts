@@ -3,7 +3,6 @@ import client from "../db/client.ts";
 import { TABLE } from "../db/config.ts";
 // Interface
 import User from "../interfaces/User.ts";
-import Rst from "../interfaces/Result.ts";
 
 export default {
 

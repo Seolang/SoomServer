@@ -1,9 +1,8 @@
-export default interface Rst {
-    GAME_KEY?: number,
+export default interface rst {
     USR_SEQ: number,
-    GAME_TYPE?: string,
-    GAME_LEVEL?: number,
-    SCORE?: number,
-    EXERCISE_AMOUNT?: number
+    DATA?: string,
+    TYPE?: string,
+    DATE: string,
+    ID?: string,
+    UUID?: string,
   }
-  

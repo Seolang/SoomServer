@@ -9,6 +9,6 @@ router
   .get("/users", userController.getAllUsers)
   .post("/login", login)
   .get("/result", resultController.getAllResult)
-  .post("/result", resultController.createResult)
+  .post("/result", resultController.createRawResult)
 
 export default router;
