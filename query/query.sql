@@ -1,5 +1,5 @@
 /* 유저 테이블 */
-CREATE TABLE `TB_USER` (
+CREATE TABLE `TB_USER` IF NOT EXISTS (
   `USR_SEQ` bigint NOT NULL AUTO_INCREMENT,
   `USR_ID` varchar(255) NOT NULL,
   `TYP` char(1) NOT NULL,

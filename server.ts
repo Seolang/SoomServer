@@ -2,21 +2,21 @@ import { Application } from "https://deno.land/x/oak/mod.ts";
 import { green, yellow } from "https://deno.land/std@0.53.0/fmt/colors.ts";
 
 // routes
-import routes from "./routes/routes.ts";
+import userRouter from "./routes/user.ts";
 // logger
-import logger from './middlewares/logger.ts';
+import logger from "./middlewares/logger.ts";
 // not found
-import notFound from './middlewares/notFound.ts';
+import notFound from "./middlewares/notFound.ts";
 
 const app = new Application();
-const port: number = 8000;
+const port: number = 18090;
 
-// order of execution is important;
+// order of execution is important;+
 app.use(logger.logger);
 app.use(logger.responseTime);
 
-app.use(routes.routes());
-app.use(routes.allowedMethods());
+app.use(userRouter.routes());
+app.use(userRouter.allowedMethods());
 
 // 404 page
 app.use(notFound);
@@ -29,4 +29,4 @@ app.addEventListener("listen", ({ secure, hostname, port }) => {
   );
 });
 
-await app.listen({ port });
+await app.listen({ port: port });

@@ -1,32 +1,17 @@
 import { Client } from "https://deno.land/x/mysql/mod.ts";
+import { config as dotEnvConfig } from 'https://deno.land/x/dotenv@v3.0.0/mod.ts';
+
 // config
 import { DATABASE, TABLE } from "./config.ts";
+
+dotEnvConfig({ export: true});
 
 const client = await new Client();
 
 client.connect({
-  hostname: "192.168.1.113",
-  username: "mcttoy",
-  password: "akcpxp486$",
-  db: "breathe",
+  hostname: Deno.env.get('hostname'), //db 주소
+  username: Deno.env.get('username'), //db 계정명
+  password: Deno.env.get('password'), //db 비밀번호
+  db: Deno.env.get('db'),             //db 이름
 });
-
-// const createQuery = async () => {
-//   await client.execute(`CREATE DATABASE IF NOT EXISTS ${DATABASE}`);
-//   await client.execute(`USE ${DATABASE}`);
-
-//   await client.execute(`DROP TABLE IF EXISTS ${TABLE.TB_USER}`);
-//   // create table
-//   await client.execute(`
-//     CREATE TABLE ${TABLE.TB_USER} (
-//         id int(11) NOT NULL AUTO_INCREMENT,
-//         user varchar(100) NOT NULL,
-//         isCompleted boolean NOT NULL default false,
-//         PRIMARY KEY (id)
-//     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-//   `);
-// };
-
-// createQuery();
-
 export default client;
